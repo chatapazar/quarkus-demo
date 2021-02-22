@@ -1,0 +1,94 @@
+step demo part I
+
+0. create native before demo and don't use clean in maven
+
+1. code.quarkus.io
+add resteasy, container, openapi, micrometer, health, kubernetes
+
+2. open quarkus-webinar/getting-started
+
+code . --> open vscode
+mvn quarkus:dev
+open browser --> 
+localhost:8080
+localhost:8080/hello
+loclahost:8080/x
+show /q/openapi
+show /q/swagger-ui
+show /q/health-ui
+show /q/actuator/prometheus
+localhost:8080/q/dev --> dev ui
+
+build image --> jar, docker 
+
+ctrl-c
+
+build package jar --> mvn package -DskipTests
+
+build native (show command only) --> mvn package -DskipTests -Pnative
+
+show output --> ll target
+
+run jar version --> java -Dquarkus.http.port=9090 -jar target/getting-started-1.0.0-SNAPSHOT-runner.jar
+new terminal
+cd quarkus-webinar/getting-started 
+run ./target/getting-started-1.0.0-SNAPSHOT-runner
+use activity monitor show memory
+use command line show start up time
+close all
+mvn clean package -Dquarkus.native.container-build=true -DskipTests=true -Pnative 
+
+Dockerfile.minimal
+
+
+show remote live code
+cd /quarkus-remote
+code .
+mvn quarkus:dev
+live code change --> localhost:8080/hello
+
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-resteasy-reactive</artifactId>
+        </dependency>
+
+show deploy on openshift
+oc login
+oc project quarkus-remote
+mvn clean package -DskipTests -Dquarkus.kubernetes.deploy=true
+show develop perspective
+show output /hello from route
+open vs code
+comment
+# quarkus.container-image.build=true
+# quarkus.kubernetes-client.trust-certs=true
+# quarkus.kubernetes.deployment-target=openshift
+# quarkus.openshift.expose=true
+# quarkus.openshift.env-vars.quarkus-launch-devmode.value=true
+
+run mvn quarkus:remote-dev
+
+edit GreetingResource.java to OCP
+show container log
+show output
+
+part II
+
+spring to quarkus
+docker run --ulimit memlock=-1:-1 -it --rm=true --memory-swappiness=0 --name tododb -e POSTGRES_USER=todo -e POSTGRES_PASSWORD=todo -e POSTGRES_DB=tododb -p 5432:5432 postgres:11.5 
+cd todo-spring-quarkus
+
+./mvnw clean spring-boot:run
+view localhost:8080, test input, openapi, swagger, metrics, healthcheck
+ctrl-c
+./.mvnw quarkus:dev
+code .
+view dependency spring web, jpa, openapi, actutor, prometheus
+view 4 class TodoApplication, Controller, Entity, Repository
+
+build quarkus with quarkus.package.type=uber-jar
+compare in cd /work/workspace/output
+java -Dserver.port=9090 -jar todo-spring-quarkus-0.0.1-SNAPSHOT.jar
+java -jar -jar todo-spring-quarkus-0.0.1-SNAPSHOT-runner.jar
+./todo-spring-quarkus-0.0.1-SNAPSHOT-runner
+compare size, start time, memory
